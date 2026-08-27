@@ -1,0 +1,4 @@
+store_id,store_name,city,region,opening_date,active
+S001,Lima Centro,Lima,Central,2024-01-15,True
+S002,Cusco Plaza,Cusco,Central,2024-01-15,True
+S003,Arequipa Mall,Arequipa,Central,2024-01-15,True

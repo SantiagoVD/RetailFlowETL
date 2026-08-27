@@ -1,0 +1,25 @@
+datasets:
+  sales:
+    input_format: csv
+    primary_key: sale_id
+    bronze_partitioned: true
+  customers:
+    input_format: csv
+    primary_key: customer_id
+    bronze_partitioned: true
+  products:
+    input_format: csv
+    primary_key: product_id
+    bronze_partitioned: true
+  stores:
+    input_format: csv
+    primary_key: store_id
+    bronze_partitioned: true
+  payments:
+    input_format: json
+    primary_key: payment_id
+    bronze_partitioned: true
+  inventory:
+    input_format: xlsx
+    primary_key: inventory_id
+    bronze_partitioned: true

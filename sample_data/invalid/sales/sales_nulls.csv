@@ -1,0 +1,2 @@
+sale_id,sale_date,customer_id,product_id,store_id,payment_id,quantity,unit_price,discount_percentage
+SA000001,2026-08-01,C001,P001,S001,PAY000001,,8.5,10

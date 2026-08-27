@@ -1,0 +1,6 @@
+pipeline:
+  input_prefix: input
+  layers: [bronze, silver, gold, quarantine]
+  metadata_prefix: metadata
+  max_records_per_file: 100000
+  log_level: INFO

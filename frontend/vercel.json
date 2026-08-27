@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/about", "destination": "/" },
+    { "source": "/runs", "destination": "/" },
+    { "source": "/runs/:runId", "destination": "/" }
+  ]
+}

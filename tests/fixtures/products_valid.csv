@@ -1,0 +1,6 @@
+product_id,product_name,category,brand,unit_cost,unit_price,active
+P001,Coffee,Grocery,RetailFlow,4.0,8.5,True
+P002,Tea,Grocery,RetailFlow,3.0,7.0,True
+P003,Notebook,Stationery,RetailFlow,2.0,5.5,True
+P004,Backpack,Accessories,RetailFlow,18.0,35.0,True
+P005,Bottle,Home,RetailFlow,6.0,14.0,True

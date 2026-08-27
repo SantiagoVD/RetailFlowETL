@@ -1,0 +1,2 @@
+customer_id,first_name,last_name,email,city,region,registration_date,segment
+C001,Ana,Customer,invalid-email,Lima,Central,2026-01-05,VIP

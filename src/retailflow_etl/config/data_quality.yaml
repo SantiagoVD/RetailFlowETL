@@ -1,0 +1,30 @@
+datasets:
+  sales:
+    - {type: null, columns: [sale_id, sale_date, customer_id, product_id, store_id, payment_id, quantity, unit_price, discount_percentage]}
+    - {type: duplicate, columns: [sale_id]}
+    - {type: date, column: sale_date}
+    - {type: range, column: quantity, min: 0.000001}
+    - {type: range, column: unit_price, min: 0}
+    - {type: range, column: discount_percentage, min: 0, max: 100}
+  customers:
+    - {type: null, columns: [customer_id]}
+    - {type: date, column: registration_date}
+    - {type: business, column: email, check: email, required: false}
+    - {type: business, column: segment, check: in, values: [STANDARD, PREMIUM, VIP]}
+  products:
+    - {type: null, columns: [product_id, product_name]}
+    - {type: range, column: unit_cost, min: 0}
+    - {type: range, column: unit_price, min: 0}
+  stores:
+    - {type: null, columns: [store_id, store_name]}
+    - {type: date, column: opening_date}
+  payments:
+    - {type: null, columns: [payment_id, sale_id]}
+    - {type: range, column: amount, min: 0}
+    - {type: business, column: payment_method, check: in, values: [CASH, CARD, TRANSFER, DIGITAL_WALLET]}
+    - {type: business, column: payment_status, check: in, values: [PAID, PENDING, REFUNDED]}
+  inventory:
+    - {type: null, columns: [inventory_id, store_id, product_id]}
+    - {type: range, column: stock_quantity, min: 0}
+    - {type: range, column: minimum_stock, min: 0}
+    - {type: date, column: snapshot_date}

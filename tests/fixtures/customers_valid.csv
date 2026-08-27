@@ -1,0 +1,6 @@
+customer_id,first_name,last_name,email,city,region,registration_date,segment
+C001,Ana,Customer,customer1@example.com,Lima,Central,2026-01-05,VIP
+C002,Bruno,Customer,customer2@example.com,Cusco,Central,2026-01-05,PREMIUM
+C003,Carla,Customer,customer3@example.com,Lima,Central,2026-01-05,STANDARD
+C004,Diego,Customer,customer4@example.com,Arequipa,Central,2026-01-05,STANDARD
+C005,Elena,Customer,customer5@example.com,Trujillo,Central,2026-01-05,PREMIUM

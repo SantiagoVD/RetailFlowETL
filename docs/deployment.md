@@ -1,0 +1,3 @@
+# Deployment
+
+Install AWS SAM CLI and Docker when using container builds for Linux-compatible dependencies. Configure AWS credentials with the AWS CLI, never in `.env` committed to Git. The template uses the public AWS SDK for pandas layer for pandas/PyArrow because bundling those binaries into a custom layer exceeds Lambda's 262 MB unzipped limit; the project-owned layer contains only openpyxl and PyYAML. Run `sam validate`, then `sam build --use-container` and deploy with `scripts/deploy.ps1`. Review the CloudFormation change set and provide a globally unique bucket name. The default pandas layer ARN targets us-east-1 Python 3.12 and can be overridden with `PandasLayerArn`.

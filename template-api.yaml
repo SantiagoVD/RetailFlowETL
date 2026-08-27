@@ -1,0 +1,157 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: RetailFlow Operations Console HTTP API.
+
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues: [dev, prod]
+  BucketName:
+    Type: String
+    Description: Existing RetailFlow ETL bucket.
+  AllowedOrigin:
+    Type: String
+    Default: http://localhost:5173
+    Description: Frontend origin allowed by the HTTP API.
+  PandasLayerArn:
+    Type: String
+    Default: arn:aws:lambda:us-east-1:336392948345:layer:AWSSDKPandas-Python312:31
+    Description: AWS SDK for pandas layer containing PyArrow.
+
+Resources:
+  RetailFlowHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: $default
+      CorsConfiguration:
+        AllowOrigins:
+          - !Ref AllowedOrigin
+        AllowHeaders:
+          - content-type
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+
+  RetailFlowApiRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: RetailFlowApiDataAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::${BucketName}'
+                Condition:
+                  StringLike:
+                    s3:prefix:
+                      - metadata/runs/*
+              - Effect: Allow
+                Action: s3:GetObject
+                Resource:
+                  - !Sub 'arn:${AWS::Partition}:s3:::${BucketName}/metadata/*'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${BucketName}/gold/*'
+                  - !Sub 'arn:${AWS::Partition}:s3:::${BucketName}/quarantine/*'
+              - Effect: Allow
+                Action: s3:PutObject
+                Resource: !Sub 'arn:${AWS::Partition}:s3:::${BucketName}/input/*'
+
+  RetailFlowApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'retailflow-api-${Environment}'
+      CodeUri: src
+      Handler: retailflow_api.handler.api_handler.lambda_handler
+      Runtime: python3.12
+      Architectures: [x86_64]
+      MemorySize: 1024
+      Timeout: 30
+      Role: !GetAtt RetailFlowApiRole.Arn
+      Layers:
+        - !Ref PandasLayerArn
+      Environment:
+        Variables:
+          DATA_BUCKET: !Ref BucketName
+          INPUT_PREFIX: input
+          METADATA_PREFIX: metadata
+          GOLD_PREFIX: gold
+          QUARANTINE_PREFIX: quarantine
+          UPLOAD_URL_EXPIRY: '300'
+          DOWNLOAD_URL_EXPIRY: '300'
+          MAX_UPLOAD_BYTES: '10485760'
+          ALLOWED_ORIGIN: !Ref AllowedOrigin
+      Events:
+        CreateUpload:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RetailFlowHttpApi
+            Path: /uploads
+            Method: POST
+        UploadStatus:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RetailFlowHttpApi
+            Path: /uploads/{uploadId}
+            Method: GET
+        ListRuns:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RetailFlowHttpApi
+            Path: /runs
+            Method: GET
+        RunDetail:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RetailFlowHttpApi
+            Path: /runs/{runId}
+            Method: GET
+        RunResult:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RetailFlowHttpApi
+            Path: /runs/{runId}/result
+            Method: GET
+        RunErrors:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RetailFlowHttpApi
+            Path: /runs/{runId}/errors
+            Method: GET
+        RunDownload:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RetailFlowHttpApi
+            Path: /runs/{runId}/download
+            Method: GET
+        QuarantineDownload:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref RetailFlowHttpApi
+            Path: /runs/{runId}/quarantine-download
+            Method: GET
+
+  RetailFlowApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${RetailFlowApiFunction}'
+      RetentionInDays: 14
+
+Outputs:
+  ApiUrl:
+    Description: HTTP API base URL.
+    Value: !Sub 'https://${RetailFlowHttpApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}'
+  ApiFunctionName:
+    Value: !Ref RetailFlowApiFunction
+  ApiId:
+    Value: !Ref RetailFlowHttpApi

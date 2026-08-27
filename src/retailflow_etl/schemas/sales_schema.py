@@ -1,0 +1,1 @@
+SCHEMA = {"sale_id": "string", "sale_date": "date", "customer_id": "string", "product_id": "string", "store_id": "string", "payment_id": "string", "quantity": "float", "unit_price": "float", "discount_percentage": "float"}
